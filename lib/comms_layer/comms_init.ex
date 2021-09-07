@@ -5,6 +5,10 @@ defmodule Raft.ClusterConfig do
   require Logger
 
   def init(state) do
+    Logger.debug("Checking networking connection status")
+
+    check_net_status()
+
     Logger.debug("Enabling EPMD ")
 
     case System.cmd("epmd", ["-daemon"]) do
@@ -15,7 +19,7 @@ defmodule Raft.ClusterConfig do
     {:ok, host_name} = :inet.gethostname()
 
     host_name_s = to_string(host_name)
-    node_name = ("peer@" <> host_name_s) |> String.to_atom()
+    node_name = (host_name_s <> "@" <> host_name_s <> ".local") |> String.to_atom()
 
     Logger.debug("Starting distributed node #{inspect(node_name)}")
 
@@ -58,5 +62,19 @@ defmodule Raft.ClusterConfig do
 
     Logger.info("Connected to nodes: #{inspect(Node.list())}")
     Atom.to_string(Node.self())
+  end
+
+  def check_net_status() do
+    wlan_status = VintageNet.get(["interface", "wlan0", "connection"])
+
+    case wlan_status do
+      :internet ->
+        Logger.info("Networking configured to :internet")
+
+      _ ->
+        Logger.warning("Networking not configured. Trying again in 5 seconds")
+        :timer.sleep(5000)
+        check_net_status()
+    end
   end
 end

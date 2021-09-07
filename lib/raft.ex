@@ -20,7 +20,7 @@ defmodule Raft do
 
   def current_state() do
     state = Main.show_current_state()
-    Logger.info(inspect(state))
+    Logger.info("Current Raft state: #{inspect(state, pretty: true)}")
   end
 
   def current_leader() do
@@ -30,6 +30,6 @@ defmodule Raft do
 
   def current_log() do
     state = Main.show_current_state()
-    Logger.info(inspect(state.log))
+    Logger.info("Current log entries: #{inspect(state.log, pretty: true)}")
   end
 end

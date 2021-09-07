@@ -10,10 +10,14 @@ Application.start(:nerves_bootstrap)
 
 config :raft,
   target: Mix.target(),
-  peers: [:"peer@nerves-9ef5.local", :"peer@nerves-9c9e.local", :"peer@nerves-9398.local"],
-  min_election_timeout: 800,
-  max_election_timeout: 1100,
-  heartbeat_timeout: 500,
+  peers: [
+    :"nerves-9ef5@nerves-9ef5.local",
+    :"nerves-9c9e@nerves-9c9e.local",
+    :"nerves-9398@nerves-9398.local"
+  ],
+  min_election_timeout: 150,
+  max_election_timeout: 300,
+  heartbeat_timeout: 50,
   cookie: :secret
 
 # Customize non-Elixir parts of the firmware. See
@@ -48,6 +52,15 @@ config :logger, backends: [RingLogger]
 #   level: :debug,
 #   format: {Raft.LogFormatter, :format},
 #   metadata: [:node, :mfa]
+
+config :mdns_lite,
+  dns_bridge_enabled: true,
+  dns_bridge_ip: {127, 0, 0, 53},
+  dns_bridge_port: 53,
+  dns_bridge_recursive: true
+
+config :vintage_net,
+  additional_name_servers: [{127, 0, 0, 53}]
 
 if Mix.target() == :host or Mix.target() == :"" do
   import_config "host.exs"

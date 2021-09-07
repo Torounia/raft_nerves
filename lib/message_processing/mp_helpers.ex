@@ -88,9 +88,7 @@ defmodule Raft.MessageProcessing.Helpers do
 
   def append_entries(log_length, leader_commit, entries, state) do
     Logger.debug(
-      "Append Entries #{inspect(entries)}, log length: #{inspect(log_length)}, timestamp: #{
-        inspect(Time.utc_now())
-      }"
+      "Append Entries #{inspect(entries)}, log length: #{inspect(log_length)}, timestamp: #{inspect(Time.utc_now())}"
     )
 
     state =
@@ -112,17 +110,13 @@ defmodule Raft.MessageProcessing.Helpers do
     )
 
     Logger.debug(
-      "Enum.count(state.log): #{inspect(Enum.count(state.log))}, timestamp: #{
-        inspect(Time.utc_now())
-      }"
+      "Enum.count(state.log): #{inspect(Enum.count(state.log))}, timestamp: #{inspect(Time.utc_now())}"
     )
 
     state =
       if log_length + Enum.count(entries) > Enum.count(state.log) do
         Logger.debug(
-          "log_length + Enum.count(entries) > Enum.count(state.log) is TRUE, timestamp: #{
-            inspect(Time.utc_now())
-          }"
+          "log_length + Enum.count(entries) > Enum.count(state.log) is TRUE, timestamp: #{inspect(Time.utc_now())}"
         )
 
         range = (Enum.count(state.log) - log_length)..(Enum.count(entries) - 1)
@@ -141,7 +135,9 @@ defmodule Raft.MessageProcessing.Helpers do
       if leader_commit > state.commit_length do
         msg_to_deliver = Enum.slice(state.log, state.commit_length..(leader_commit - 1))
         # TODO Deliver message to application
-        for msg <- msg_to_deliver, do: Logger.info("Message to application #{inspect(msg.cmd)}")
+        for msg <- msg_to_deliver,
+            do: Logger.info("New Log Entry #{inspect(msg.cmd)} appended to the Log.")
+
         %{state | commit_length: leader_commit}
       else
         state
@@ -162,7 +158,7 @@ defmodule Raft.MessageProcessing.Helpers do
 
         for msg <- msg_to_deliver do
           Logger.info(
-            "Message to application #{inspect(msg.cmd)} originated from #{inspect(msg.originator)}"
+            "New Log Entry #{inspect(msg.cmd)} from #{inspect(msg.originator)} appended to the Log"
           )
 
           ## send confirmatrion to originator
