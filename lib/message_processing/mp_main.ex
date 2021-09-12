@@ -96,7 +96,7 @@ defmodule Raft.MessageProcessing.Main do
           :init.stop()
 
         {:ok_commited, payload} ->
-          Logger.info("Command #{inspect(payload)} has been commited on all nodes")
+          Logger.info("Log Entry #{inspect(payload)} has been commited on all nodes")
           state
 
         {:report_state, payload} ->
@@ -106,13 +106,11 @@ defmodule Raft.MessageProcessing.Main do
 
           MP_types.send_current_state(payload, state)
 
-        {:newLeader, payload} ->
-          Logger.info(
-            "New leader election request from #{inspect(payload)}. Sending to MessageProcessing"
-          )
+        {:rebootNode, _payload} ->
+          Logger.warning("Rebooring node in 5 seconds")
 
-          :timer.sleep(2000)
-          # MP_types.canditate(state)
+          :timer.sleep(5000)
+          Nerves.Runtime.reboot()
       end
 
     # Logger.debug("New state = #{inspect(new_state)}")

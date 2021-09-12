@@ -90,7 +90,8 @@ defmodule Raft.MessageProcessing.Types do
           state
           | current_term: c_term,
             current_role: :follower,
-            voted_for: c_Id
+            voted_for: c_Id,
+            votes_received: []
         }
 
         Logger.info("New election, voting for #{inspect(c_Id)}")
@@ -131,7 +132,8 @@ defmodule Raft.MessageProcessing.Types do
           state
           | current_term: term,
             current_role: :follower,
-            voted_for: nil
+            voted_for: nil,
+            votes_received: []
         }
       else
         state
@@ -244,7 +246,8 @@ defmodule Raft.MessageProcessing.Types do
           | current_term: term,
             voted_for: nil,
             current_role: :follower,
-            current_leader: leader_id
+            current_leader: leader_id,
+            votes_received: []
         }
 
         Logger.info("Term #{inspect(term)} is > than current term #{inspect(state.current_term)}.
@@ -260,7 +263,8 @@ defmodule Raft.MessageProcessing.Types do
         state = %{
           state
           | current_role: :follower,
-            current_leader: leader_id
+            current_leader: leader_id,
+            votes_received: []
         }
 
         Logger.info("Term #{inspect(term)} == current term #{inspect(state.current_term)}.
@@ -290,7 +294,8 @@ defmodule Raft.MessageProcessing.Types do
         state = %{
           state
           | current_role: :follower,
-            current_leader: leader_id
+            current_leader: leader_id,
+            votes_received: []
         }
 
         Logger.debug(
